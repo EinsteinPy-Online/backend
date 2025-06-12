@@ -22,8 +22,6 @@ from einsteinpy.symbolic.predefined import Kerr, KerrNewman, Schwarzschild
 
 from Tensor import Tensor
 
-print("Iniciando o servidor Flask na porta http://10.0.0.106:8081 ")
-
 # Criando aplicação
 app = Flask(__name__)
 CORS(app)
@@ -75,12 +73,8 @@ def calcular_tensores():
 # Classe Tensor
 class Tensor:
     def __init__(self, metric="Schwarzschild"):
-        self.__metric = self.__get_metric(metric)
-
-    def __init__(self, metric="KerrNewman"):
-        self.__metric = self.__get_metric(metric)
-    
-    def __init__(self, metric="Kerr"):
+        if metric not in ["Schwarzschild", "KerrNewman", "Kerr", "FLRW"]:
+            raise ValueError(f"Métrica inválida: {metric}")
         self.__metric = self.__get_metric(metric)
 
     def __get_metric(self, metric_name):  # noqa: C901
@@ -171,7 +165,7 @@ class Tensor:
         return str(K)
 
 
-
 if __name__ == "__main__":
     # Iniciando o servidor com o APPLICATION_ROOT configurado
+    print("Iniciando o servidor Flask na porta http://0.0.0.0:8081 ")
     serve(app, host="0.0.0.0", port=8081)
