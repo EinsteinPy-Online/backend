@@ -1,23 +1,4 @@
 
-##### Informações Importantes
-
-
-
-email: einsteinpy.online@gmail.com
-
-senha: einsteinpy2025
-
-
-
-GitHub: EinsteinPy-Online
-
-senha:einsteinpy2025
-
-
-
-Token de acesso do repositório (PAT):   ghp\_iCoc6Wtm1R4dwoVyutPwGr0oR7u5eC4ESPSF
-
-
 
 
 
