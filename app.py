@@ -75,6 +75,7 @@ class Tensor:
     def __init__(self, metric="Schwarzschild"):
         if metric not in ["Schwarzschild", "KerrNewman", "Kerr", "FLRW"]:
             raise ValueError(f"Métrica inválida: {metric}")
+        self.__metric_name = metric
         self.__metric = self.__get_metric(metric)
 
     def __get_metric(self, metric_name):  # noqa: C901
@@ -127,44 +128,38 @@ class Tensor:
     def get_kretschmann_scalar(self, substitutions=None):
         """
         Calcula o escalar de Kretschmann: K = R_{abcd} R^{abcd}
-        
+
         Args:
             substitutions (dict): Dicionário opcional com substituições, ex: {c: 1, G: 1}
         """
-        R = RiemannCurvatureTensor.from_metric(self.__metric)
-        R_down = R.tensor()
-        g_inv = self.__metric.inv()
-        K = 0
-        dim = self.__metric.tensor().shape[0]
-
-        # Contração total dos índices
-        for a in range(dim):
-            for b in range(dim):
-                for c in range(dim):
-                    for d in range(dim):
-                        for e in range(dim):
-                            for f in range(dim):
-                                for g in range(dim):
-                                    for h in range(dim):
-                                        term = (
-                                            g_inv[a, e]
-                                            * g_inv[b, f]
-                                            * g_inv[c, g]
-                                            * g_inv[d, h]
-                                            * R_down[a, b, c, d]
-                                            * R_down[e, f, g, h]
-                                        )
-                                        K += term
-
-        # Substituições opcionais, como c=1, G=1 etc.
-        if substitutions:
-            K = K.subs(substitutions)
-
-        K = sy.trigsimp(sy.simplify(K))
-
-        return str(K)
-
-
+        if self.__metric_name == "Schwarzschild":
+            simbols = sy.symbols("t r theta phi")
+            t,r,theta,phi = simbols
+            G,M,c = sy.symbols("G M c")
+            rs = 2*G*M/c**2
+            m = sy.diag(
+                -(1-rs/r),
+                1/(1-rs/r),
+                r**2,
+                (r*sin(theta))**2
+            ).tolist()
+            metric_sch = MetricTensor(m,simbols)
+            R = RiemannCurvatureTensor.from_metric(metric_sch)
+            R_up = R.change_config('uuuu')
+            R_down = R.change_config('llll')
+            Tensor = sy.tensorproduct(R_down.arr,R_up.arr)
+            k = sy.tensorcontraction(Tensor,(0,4),(1,5),(2,6),(3,7))
+            K = sy.trigsimp(sy.simplify(k))
+            return str(K)
+        else:
+            R = RiemannCurvatureTensor.from_metric(self.__metric)
+            R_up = R.change_config('uuuu')
+            R_down = R.change_config('llll')
+            Tensor = sy.tensorproduct(R_down.arr,R_up.arr)
+            k = sy.tensorcontraction(Tensor,(0,4),(1,5),(2,6),(3,7))
+            K = sy.trigsimp(sy.simplify(k))
+            return str(K)
+        
 if __name__ == "__main__":
     # Iniciando o servidor com o APPLICATION_ROOT configurado
     print("Iniciando o servidor Flask na porta http://0.0.0.0:8081 ")
