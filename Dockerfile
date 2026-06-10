@@ -11,6 +11,7 @@ RUN apk add --no-cache \
     llvm15-dev \
     llvm15-libs \
     clang \
+    cmake \
     llvm15
 
 # Define a variável de ambiente para apontar para o llvm-config
