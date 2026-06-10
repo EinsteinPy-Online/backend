@@ -6,12 +6,12 @@ WORKDIR /app
 # Instala dependências do sistema necessárias, fixando a versão do LLVM para evitar conflitos
 RUN apk add --no-cache \
     build-base \
+    cmake \
     libffi-dev \
     gfortran \
     llvm15-dev \
     llvm15-libs \
     clang \
-    cmake \
     llvm15
 
 # Define a variável de ambiente para apontar para o llvm-config
